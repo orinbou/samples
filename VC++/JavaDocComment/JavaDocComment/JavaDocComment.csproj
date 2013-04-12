@@ -31,11 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CustomActions">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\SourceForge.net\DoxyComment add-in for Visual Studio 2010\Setup\CustomActions.dll</HintPath>
-    </Reference>
     <Reference Include="DoxyComment">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\SourceForge.net\DoxyComment add-in for Visual Studio 2010\DoxyComment.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\SourceForge.net\DoxyComment add-in for Visual Studio 2010\DoxyComment.dll</HintPath>
     </Reference>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
