@@ -103,14 +103,19 @@ namespace JavaDocComment
                 rv.Add(FirstLineTag);
             }
 
-            rv.Add(NormalLineTag + "ここに" + codeElem.Name + "の要約を記載.");
-            rv.Add(NormalLineTag + "ここに" + codeElem.Name + "の詳細を記載.");
+            // DEL 20130502 20:49:38 sunada@ipl Start -->
+            //rv.Add(NormalLineTag + "ここに" + codeElem.Name + "の要約を記載.");
+            //rv.Add(NormalLineTag + "ここに" + codeElem.Name + "の詳細を記載.");
+            // DEL 20130502 20:49:38 sunada@ipl  End  <--
             return rv;
         }
 
         private void AppendCommentFooter(VCCodeElement codeElem, ArrayList buffer)
         {
-            buffer.Add(NormalLineTag + CommandPrefix + "remarks ここに" + codeElem.Name + "の備考を記載.");
+            // DEL 20130502 20:55:49 sunada@ipl Start -->
+            //buffer.Add(NormalLineTag + CommandPrefix + "brief ここに" + codeElem.Name + "の要約を記載.");
+            //buffer.Add(NormalLineTag + CommandPrefix + "note  ここに" + codeElem.Name + "の詳細を記載.");
+            // DEL 20130502 20:55:49 sunada@ipl  End  <--
 
             // Does the comment provider require a last line tag?
             if (LastLineTag.Length > 0)
@@ -170,14 +175,16 @@ namespace JavaDocComment
             ArrayList rv;
 
             rv = CreateCommentHeader((VCCodeElement)codeElem);
-            if ((codeElem.Parameters.Count > 0))
-            {
-                foreach (VCCodeParameter curParam in codeElem.Parameters)
-                {
-                    rv.Add(NormalLineTag + CommandPrefix + "param   " + curParam.Name
-                        + " パラメータ" + curParam.Name + "の説明を記載.");
-                }
-            }
+            // DEL 20130502 20:35:29 sunada@ipl Start -->
+            //if ((codeElem.Parameters.Count > 0))
+            //{
+            //    foreach (VCCodeParameter curParam in codeElem.Parameters)
+            //    {
+            //        rv.Add(NormalLineTag + CommandPrefix + "param   " + curParam.Name
+            //            + " パラメータ" + curParam.Name + "の説明を記載.");
+            //    }
+            //}
+            // DEL 20130502 20:35:29 sunada@ipl  End  <--
             AppendCommentFooter((VCCodeElement)codeElem, rv);
 
             return (string[])rv.ToArray(typeof(string));
@@ -210,27 +217,32 @@ namespace JavaDocComment
             rv = CreateCommentHeader((VCCodeElement)codeElem);
 
             // Create /param sections for each parameters in the function
-            if (codeElem.Parameters.Count > 0)
-            {
-                foreach (VCCodeParameter curParam in codeElem.Parameters)
-                {
+            rv.Add(NormalLineTag + "ここに" + codeElem.Name + "の概要を記載.");
+            // DEL 20130502 20:35:53 sunada@ipl Start -->
+            //if (codeElem.Parameters.Count > 0)
+            //{
+            //    foreach (VCCodeParameter curParam in codeElem.Parameters)
+            //    {
 
-                    rv.Add(NormalLineTag + CommandPrefix + "param   " + curParam.Name
-                        + " パラメータ" + curParam.Name + "の説明を記載.");
-                }
-            }
-            rv.Add(NormalLineTag + CommandPrefix + "see     ");
+            //        rv.Add(NormalLineTag + CommandPrefix + "param   " + curParam.Name
+            //            + " パラメータ" + curParam.Name + "の説明を記載.");
+            //    }
+            //}
+            //rv.Add(NormalLineTag + CommandPrefix + "see     ");
+            // DEL 20130502 20:35:53 sunada@ipl  End  <--
             // Create /returns section
             if ((codeElem.TypeString.Length > 0) &
                 (codeElem.TypeString.ToLower() != "void"))
             {
-
-                rv.Add(NormalLineTag + CommandPrefix + "return  "
-                    + "ここに戻り値の説明を記載.");
+                rv.Add(NormalLineTag + CommandPrefix + "return  " + "ここに戻り値の説明を記載.");
+                rv.Add(NormalLineTag + CommandPrefix + "retval  " + "ここに戻り値の説明を記載.");
+                rv.Add(NormalLineTag + CommandPrefix + "note    " + "ここに" + codeElem.Name + "の詳細を記載.");
             }
 
             // Create /throws section
-            rv.Add(NormalLineTag + CommandPrefix + "throws <exception class> この例外を投げるための基準の説明を記載.");
+            // DEL 20130502 20:41:22 sunada@ipl Start -->
+            //rv.Add(NormalLineTag + CommandPrefix + "throws <exception class> この例外を投げるための基準の説明を記載.");
+            // DEL 20130502 20:41:22 sunada@ipl  End  <--
 
             AppendCommentFooter((VCCodeElement)codeElem, rv);
 
@@ -246,7 +258,8 @@ namespace JavaDocComment
                 rv.Add(FirstLineTag);
             }
 
-            rv.Add(NormalLineTag + CommandPrefix + "brief   ここに " + codeElem.Name + " の要約を記載.");
+            rv.Add(NormalLineTag + CommandPrefix + "brief ここに" + codeElem.Name + "の要約を記載.");
+            rv.Add(NormalLineTag + CommandPrefix + "note  ここに" + codeElem.Name + "の詳細を記載.");
 
             // End tag required?
             if (LastLineTag.Length > 0)
@@ -283,6 +296,11 @@ namespace JavaDocComment
 
             // Header
             rv = CreateCommentHeader((VCCodeElement)codeElem);
+
+            // ADD 20130502 20:59:14 sunada@ipl Start -->
+            rv.Add(NormalLineTag + CommandPrefix + "brief ここに" + codeElem.Name + "の要約を記載.");
+            rv.Add(NormalLineTag + CommandPrefix + "note  ここに" + codeElem.Name + "の詳細を記載.");
+            // ADD 20130502 20:59:14 sunada@ipl  End  <--
 
             // Template parameters?
             if ((codeElem.IsTemplate))
