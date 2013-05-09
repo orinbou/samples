@@ -6,5 +6,6 @@ D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\bin\Release\ja-JP\DoxyCom
 D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\bin\Release\ko-KR\DoxyComment.resources.dll
 D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\bin\Release\sv-SE\DoxyComment.resources.dll
 D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\bin\Release\zh-CN\DoxyComment.resources.dll
+D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\obj\Release\JavaDocComment.csprojResolveAssemblyReference.cache
 D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\obj\Release\JavaDocComment.dll
 D:\work\git\samples\VC++\JavaDocComment\JavaDocComment\obj\Release\JavaDocComment.pdb
