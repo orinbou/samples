@@ -57,9 +57,11 @@ Sub ExportModuleVersionList(inFolderPath)
     Dim fsoFolder
     Dim fsoSubFolder
     Dim fsoFile
+    Dim objFile
     Dim sExtName
     Dim sFileName
     Dim sFileVersion
+    Dim sFileUpdDate
     Dim sAbsPath
 
     'フォルダオブジェクト取得
@@ -80,15 +82,19 @@ Sub ExportModuleVersionList(inFolderPath)
                 objText.WriteLine("[" & sAbsPath & "]")
                 bIsPathExport = True
             End If
+            'ファイルオ情報を取得する
+            Set objFile = fsoObj.GetFile(fsoFile)
+            sFileUpdDate = objFile.DateLastModified
             'バージョン情報を出力する
             sFileName = fsoObj.GetFileName(fsoFile)
             sFileVersion = GetFileVersion(fsoFile)
-            objText.WriteLine(sFileName & vbTab & sFileVersion)
+            objText.WriteLine(sFileName & vbTab & sFileUpdDate & vbTab & sFileVersion)
         End If
     Next
 
     If bIsPathExport = True Then
-        objText.WriteLine(vbCrLf)
+        '出力情報があった場合は見難いので改行する
+        objText.WriteLine("")
     End If
 
     'フォルダ内/サブフォルダループ(サブフォルダが不要なら、このループは不要)
