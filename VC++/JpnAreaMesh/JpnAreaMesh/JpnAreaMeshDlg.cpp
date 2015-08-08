@@ -25,11 +25,16 @@ CJpnAreaMeshDlg::CJpnAreaMeshDlg(CWnd* pParent /*=NULL*/)
 void CJpnAreaMeshDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDT_LAT, m_edtLat);
+	DDX_Control(pDX, IDC_EDT_LON, m_edtLon);
+	DDX_Control(pDX, IDC_BTN_EXECUTE, m_btnExecute);
 }
 
 BEGIN_MESSAGE_MAP(CJpnAreaMeshDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_EN_CHANGE(IDC_EDT_LAT, &CJpnAreaMeshDlg::UpdateControls)
+	ON_EN_CHANGE(IDC_EDT_LON, &CJpnAreaMeshDlg::UpdateControls)
 	ON_BN_CLICKED(IDC_BTN_EXECUTE, &CJpnAreaMeshDlg::OnBnClickedBtnExecute)
 END_MESSAGE_MAP()
 
@@ -46,8 +51,28 @@ BOOL CJpnAreaMeshDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 小さいアイコンの設定
 
 	// TODO: 初期化をここに追加します。
+	this->m_edtLat.SetWindowText(_T("35.5"));
+	this->m_edtLon.SetWindowText(_T("141.5"));
+
+	// 活性制御
+	this->UpdateControls();
 
 	return TRUE;  // フォーカスをコントロールに設定した場合を除き、TRUE を返します。
+}
+
+// 活性制御
+void CJpnAreaMeshDlg::UpdateControls()
+{
+	// 緯度
+	CString strLat;
+	this->m_edtLat.GetWindowText(strLat);
+
+	// 経度
+	CString strLon;
+	this->m_edtLon.GetWindowText(strLon);
+
+	// 実行ボタン
+	this->m_btnExecute.EnableWindow((!strLat.IsEmpty() && !strLon.IsEmpty()) ? TRUE : FALSE);
 }
 
 // ダイアログに最小化ボタンを追加する場合、アイコンを描画するための
@@ -89,5 +114,37 @@ HCURSOR CJpnAreaMeshDlg::OnQueryDragIcon()
 // エリアコードを取得する
 void CJpnAreaMeshDlg::OnBnClickedBtnExecute()
 {
-	MessageBox(_T("未実装です！"));
+	// 緯度
+	CString strLat;
+	this->m_edtLat.GetWindowText(strLat);
+	const double dLat = _ttof(strLat);
+
+	// 経度
+	CString strLon;
+	this->m_edtLon.GetWindowText(strLon);
+	const double dLon = _ttof(strLon);
+
+	// メッシュコード取得
+	const CString strMeshCode = this->GetMeshCode(dLat, dLon);
+	TRACE(strMeshCode + _T("\n"));
+
+	// メッシュコード表示
+	CString strResultMsg;
+	strResultMsg.Format(_T("メッシュコード : %s"), strMeshCode);
+	MessageBox(strResultMsg);
+}
+
+// 緯度経度からメッシュコードを取得する
+CString CJpnAreaMeshDlg::GetMeshCode(
+	const double dLat,
+	const double dLon
+)
+{
+	// 1次メッシュ
+	const int iCode12 = static_cast<int>(dLat * 1.5);
+	const int iCode34 = static_cast<int>(dLon - 100);
+	CString strMeshCode1234;
+	strMeshCode1234.Format(_T("%d%d"), iCode12, iCode34);
+
+	return strMeshCode1234;
 }

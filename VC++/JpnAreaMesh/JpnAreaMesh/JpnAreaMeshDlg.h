@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "afxwin.h"
 
 
 // CJpnAreaMeshDlg ダイアログ
@@ -20,7 +21,6 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV サポート
 
-
 // 実装
 protected:
 	HICON m_hIcon;
@@ -29,7 +29,21 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
-public:
 	afx_msg void OnBnClickedBtnExecute();
+	DECLARE_MESSAGE_MAP()
+
+private:
+	// メンバ変数
+	CEdit m_edtLat;
+	CEdit m_edtLon;
+	CButton m_btnExecute;
+
+	// 活性制御
+	void UpdateControls();
+
+	// 緯度経度からエリアコードを取得する
+	CString CJpnAreaMeshDlg::GetMeshCode(
+		const double dLat,
+		const double dLon
+	);
 };
