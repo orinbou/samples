@@ -136,9 +136,7 @@ void CJpnAreaMeshDlg::OnBnClickedBtnExecute()
 
 /**
 * 緯度経度からメッシュコードを取得する.
-* 例えば新宿区新宿2-1-1にあるエルデは、緯度35.68823693、経度139.70974445、3次メッシュコード5339-4526
 * @see http://d.hatena.ne.jp/letitride/20111215
-* @see http://www.erde.co.jp/blog/?p=646
 * @param dLat 緯度
 * @param dLon 経度
 * @return メッシュコード文字列
@@ -184,7 +182,7 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	// ・2次メッシュを縦、横ともに10等分した四角形(2次メッシュを100分割)
 	// ・1辺の長さは約1kmで、緯度30秒(30 / 60 / 60)、経度45秒(45 / 60 / 60)となります。
 	// ・2次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
-	// ・1次メッシュ、2次メッシュと組み合わせてnnnn-nnnnのように記述します。
+	// ・1次メッシュ、2次メッシュと組み合わせてnnnn-nn-nnのように記述します。
 	// -----------------------------------------------------------------------
 	// 2次メッシュの南西端の緯度、経度を除算した余りを求める
 	const double dLatRest2 = dLatRest1 - (static_cast<double>(iCode5) * dLatUnit1);
@@ -204,7 +202,7 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	// ・3次メッシュを縦、横ともに10等分した四角形(3次メッシュを100分割)
 	// ・1辺の長さは約100mとなります。
 	// ・3次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
-	// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nnnn-nnのように記述します。
+	// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nn-nn-nnのように記述します。
 	// -----------------------------------------------------------------------
 	// 3次メッシュの南西端の緯度、経度を除算した余りを求める
 	const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
@@ -219,5 +217,5 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	CString strMeshCode9A;
 	strMeshCode9A.Format(_T("%d%d"), iCode9, iCodeA);
 
-	return strMeshCode1234 + _T("-") +  strMeshCode56 + _T("-") + strMeshCode9A;
+	return strMeshCode1234 + _T("-") +  strMeshCode56 + _T("-") + strMeshCode78 + _T("-") + strMeshCode9A;
 }
