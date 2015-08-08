@@ -149,7 +149,7 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 )
 {
 	// -----------------------------------------------------------------------
-	// ★1次メッシュ（一次メッシュ、正式名称は第1次地域区画）
+	// ★1次メッシュ（正式名称は第1次地域区画）
 	// ・1辺の長さが約80kmの四角形となります。
 	// ・4桁の数字で構成され、枠の西南端の緯度を上2桁、経度を下2桁で表します。
 	// ・緯度を1.5倍した値の上2桁 + 経度から100引いた値となります。
@@ -160,8 +160,8 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	strMeshCode1234.Format(_T("%02d%02d"), iCode12, iCode34);
 
 	// -----------------------------------------------------------------------
-	// ★2次メッシュ（二次メッシュ、正式名称は第2次地域区画）
-	// ・1次メッシュを縦、横ともに8等分した四角形(1次メッシュを64分割)。
+	// ★2次メッシュ（正式名称は第2次地域区画）
+	// ・1次メッシュを縦、横ともに8等分した四角形(1次メッシュを64分割)
 	// ・1辺の長さは約4kmで、緯度5分(5 / 60)、経度7分30秒(7 / 60 + 30 / 60 / 60)となります。
 	// ・1次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
 	// ・1次メッシュと組み合わせてnnnn-nnと記述します。
@@ -180,17 +180,17 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	strMeshCode56.Format(_T("%d%d"), iCode5, iCode6);
 
 	// -----------------------------------------------------------------------
-	// ★第3次メッシュ（三次メッシュ、正式名称は基準地域メッシュないし第3次地域区画）
-	// ・2次メッシュを縦、横ともに10等分した四角形(2次メッシュを100分割、1次メッシュを6400分割)。
+	// ★3次メッシュ（正式名称は基準地域メッシュないし第3次地域区画）
+	// ・2次メッシュを縦、横ともに10等分した四角形(2次メッシュを100分割)
 	// ・1辺の長さは約1kmで、緯度30秒(30 / 60 / 60)、経度45秒(45 / 60 / 60)となります。
 	// ・2次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
 	// ・1次メッシュ、2次メッシュと組み合わせてnnnn-nnnnのように記述します。
 	// -----------------------------------------------------------------------
-	// 1次メッシュの南西端の緯度、経度を除算した余りを求める
+	// 2次メッシュの南西端の緯度、経度を除算した余りを求める
 	const double dLatRest2 = dLatRest1 - (static_cast<double>(iCode5) * dLatUnit1);
 	const double dLonRest2 = dLonRest1 - (static_cast<double>(iCode6) * dLonUnit1);
 
-	// 3次メッシュの緯度経度方向ごとの刻み幅
+	// 3次メッシュの緯度経度方向ごとの刻み幅（2次メッシュの刻みの1/10）
 	const double dLatUnit2 = dLatUnit1 / 10.0;
 	const double dLonUnit2 = dLonUnit1 / 10.0;
 
@@ -199,5 +199,25 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	CString strMeshCode78;
 	strMeshCode78.Format(_T("%d%d"), iCode7, iCode8);
 
-	return strMeshCode1234 + _T("-") +  strMeshCode56 + strMeshCode78;
+	// -----------------------------------------------------------------------
+	// ★4次メッシュ（※勝手に考えました）
+	// ・3次メッシュを縦、横ともに10等分した四角形(3次メッシュを100分割)
+	// ・1辺の長さは約100mとなります。
+	// ・3次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
+	// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nnnn-nnのように記述します。
+	// -----------------------------------------------------------------------
+	// 3次メッシュの南西端の緯度、経度を除算した余りを求める
+	const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
+	const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
+
+	// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
+	const double dLatUnit3 = dLatUnit2 / 10.0;
+	const double dLonUnit3 = dLonUnit2 / 10.0;
+
+	const int iCode9 = static_cast<int>(dLatRest3 / dLatUnit3);
+	const int iCodeA = static_cast<int>(dLonRest3 / dLonUnit3);
+	CString strMeshCode9A;
+	strMeshCode9A.Format(_T("%d%d"), iCode9, iCodeA);
+
+	return strMeshCode1234 + _T("-") +  strMeshCode56 + _T("-") + strMeshCode9A;
 }
