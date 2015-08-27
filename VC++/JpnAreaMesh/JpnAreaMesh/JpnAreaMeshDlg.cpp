@@ -14,8 +14,6 @@
 
 // CJpnAreaMeshDlg ダイアログ
 
-
-
 CJpnAreaMeshDlg::CJpnAreaMeshDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_JPNAREAMESH_DIALOG, pParent)
 {
@@ -27,7 +25,9 @@ void CJpnAreaMeshDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDT_LAT, m_edtLat);
 	DDX_Control(pDX, IDC_EDT_LON, m_edtLon);
-	DDX_Control(pDX, IDC_BTN_EXECUTE, m_btnExecute);
+	DDX_Control(pDX, IDC_BTN_GET_MESH_CODE, m_btnGetMeshCode);
+	DDX_Control(pDX, IDC_EDT_MESH_CODE, m_edtMeshCode);
+	DDX_Control(pDX, IDC_BTN_GET_LAT_LON, m_btnGetLatLon);
 }
 
 BEGIN_MESSAGE_MAP(CJpnAreaMeshDlg, CDialogEx)
@@ -35,7 +35,9 @@ BEGIN_MESSAGE_MAP(CJpnAreaMeshDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_EN_CHANGE(IDC_EDT_LAT, &CJpnAreaMeshDlg::UpdateControls)
 	ON_EN_CHANGE(IDC_EDT_LON, &CJpnAreaMeshDlg::UpdateControls)
-	ON_BN_CLICKED(IDC_BTN_EXECUTE, &CJpnAreaMeshDlg::OnBnClickedBtnExecute)
+	ON_BN_CLICKED(IDC_BTN_GET_MESH_CODE, &CJpnAreaMeshDlg::OnBnClickedBtnGetMeshCode)
+	ON_EN_CHANGE(IDC_EDT_MESH_CODE, &CJpnAreaMeshDlg::UpdateControls)
+	ON_BN_CLICKED(IDC_BTN_GET_LAT_LON, &CJpnAreaMeshDlg::OnBnClickedBtnGetLatLon)
 END_MESSAGE_MAP()
 
 
@@ -53,6 +55,7 @@ BOOL CJpnAreaMeshDlg::OnInitDialog()
 	// 初期値（新宿区新宿2-1-1 エルデ）
 	this->m_edtLat.SetWindowText(_T("35.68823693"));
 	this->m_edtLon.SetWindowText(_T("139.70974445"));
+	this->m_edtMeshCode.SetWindowText(_T("5339-45-26"));
 
 	// 活性制御
 	this->UpdateControls();
@@ -71,8 +74,13 @@ void CJpnAreaMeshDlg::UpdateControls()
 	CString strLon;
 	this->m_edtLon.GetWindowText(strLon);
 
-	// 実行ボタン
-	this->m_btnExecute.EnableWindow((!strLat.IsEmpty() && !strLon.IsEmpty()) ? TRUE : FALSE);
+	// メッシュコード
+	CString strMeshCode;
+	this->m_edtMeshCode.GetWindowText(strMeshCode);
+
+	// 取得ボタン
+	this->m_btnGetMeshCode.EnableWindow((!strLat.IsEmpty() && !strLon.IsEmpty()) ? TRUE : FALSE);
+	this->m_btnGetLatLon.EnableWindow((!strMeshCode.IsEmpty()) ? TRUE : FALSE);
 }
 
 // ダイアログに最小化ボタンを追加する場合、アイコンを描画するための
@@ -112,7 +120,7 @@ HCURSOR CJpnAreaMeshDlg::OnQueryDragIcon()
 }
 
 // エリアコードを取得する
-void CJpnAreaMeshDlg::OnBnClickedBtnExecute()
+void CJpnAreaMeshDlg::OnBnClickedBtnGetMeshCode()
 {
 	// 緯度
 	CString strLat;
@@ -218,4 +226,134 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	strMeshCode9A.Format(_T("%d%d"), iCode9, iCodeA);
 
 	return strMeshCode1234 + _T("-") +  strMeshCode56 + _T("-") + strMeshCode78 + _T("-") + strMeshCode9A;
+}
+
+// 緯度・経度を取得する
+void CJpnAreaMeshDlg::OnBnClickedBtnGetLatLon()
+{
+	// メッシュコード
+	CString strMeshCode;
+	this->m_edtMeshCode.GetWindowText(strMeshCode);
+
+	double dLat = 0.0;
+	double dLon = 0.0;
+
+	// 緯度・経度取得
+	this->GetLatLonFromMeshCode(strMeshCode, dLat, dLon);
+
+	// 緯度・経度表示
+	CString strResultMsg;
+	strResultMsg.Format(_T("(Lat, Lon) : (%f, %f)"), dLat, dLon);
+	MessageBox(strResultMsg);
+}
+
+/**
+* メッシュコードから緯度経度を取得する.
+* @param strMeshCode メッシュコード
+* @param dLat 緯度
+* @param dLon 経度
+* @return true:成功 false:失敗
+*/
+bool CJpnAreaMeshDlg::GetLatLonFromMeshCode(
+	const CString strMeshCode,
+	double& dLat,
+	double& dLon
+)
+{
+	// 2次メッシュの緯度経度方向ごとの刻み幅
+	const double dLatUnit2 = (5.0 / 60.0);
+	const double dLonUnit2 = (7.0 / 60.0) + (30.0 / 60.0 / 60.0);
+	// 3次メッシュの緯度経度方向ごとの刻み幅
+	const double dLatUnit3 = dLatUnit2 / 10.0;
+	const double dLonUnit3 = dLonUnit2 / 10.0;
+	// 4次メッシュの緯度経度方向ごとの刻み幅
+	const double dLatUnit4 = dLatUnit3 / 10.0;
+	const double dLonUnit4 = dLonUnit3 / 10.0;
+
+	// 初期化
+	dLat = 0.0;
+	dLon = 0.0;
+
+	// エリアコード分割
+	CStringArray aryMeshCode;
+	this->SplitString(strMeshCode, _T("-"), aryMeshCode);
+	const INT_PTR iCount = aryMeshCode.GetCount();
+	if (iCount >= 1)
+	{
+		// 1次メッシュ
+		const CString strCode1234 = aryMeshCode.GetAt(0);
+		const CString strCode12 = strCode1234.Left(2);
+		const CString strCode34 = strCode1234.Right(2);
+		// 緯度
+		dLat = ::_ttof(strCode12) / 1.5;
+		// 経度
+		dLon = ::_ttof(strCode34) + 100.0;
+	}
+	if (iCount >= 2)
+	{
+		// 2次メッシュ
+		const CString strCode56 = aryMeshCode.GetAt(1);
+		const CString strCode5 = strCode56.Left(1);
+		const CString strCode6 = strCode56.Right(1);
+		// 緯度
+		dLat += ::_ttof(strCode5) * dLatUnit2;
+		// 経度
+		dLon += ::_ttof(strCode6) * dLonUnit2;
+	}
+	if (iCount >= 3)
+	{
+		// 3次メッシュ
+		const CString strCode78 = aryMeshCode.GetAt(2);
+		const CString strCode7 = strCode78.Left(1);
+		const CString strCode8 = strCode78.Right(1);
+		// 緯度
+		dLat += ::_ttof(strCode7) * dLatUnit3;
+		// 経度
+		dLon += ::_ttof(strCode8) * dLonUnit3;
+	}
+	if (iCount >= 4)
+	{
+		// 4次メッシュ
+		const CString strCode9A = aryMeshCode.GetAt(3);
+		const CString strCode9 = strCode9A.Left(1);
+		const CString strCodeA = strCode9A.Right(1);
+		// 緯度
+		dLat += ::_ttof(strCode9) * dLatUnit4;
+		// 経度
+		dLon += ::_ttof(strCodeA) * dLonUnit4;
+	}
+
+	return true;
+}
+
+// セパレータで文字列を分割する
+void CJpnAreaMeshDlg::SplitString(
+	const CString& strTgt,
+	const CString& strSep,
+	CStringArray& aryString
+)
+{
+	if (strTgt.IsEmpty()) return;
+
+	int intNow = strTgt.Find(strSep, 0);
+	if (intNow < 0)
+	{
+		aryString.Add(strTgt);
+		return;
+	}
+
+	int intPrev = 0;
+	while (true)
+	{
+		aryString.Add(strTgt.Mid(intPrev, intNow - intPrev));
+
+		intPrev = intNow + 1;
+		intNow = strTgt.Find(strSep, intPrev);
+
+		if (intNow < 0)
+		{
+			aryString.Add(strTgt.Mid(intPrev));
+			break;
+		}
+	}
 }
