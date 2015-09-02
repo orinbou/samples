@@ -29,21 +29,38 @@ protected:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
-	afx_msg void OnBnClickedBtnExecute();
+	afx_msg void OnBnClickedBtnGetMeshCode();
+	afx_msg void OnBnClickedBtnGetLatLon();
 	DECLARE_MESSAGE_MAP()
 
 private:
 	// メンバ変数
 	CEdit m_edtLat;
 	CEdit m_edtLon;
-	CButton m_btnExecute;
+	CButton m_btnGetMeshCode;
+	CEdit m_edtMeshCode;
+	CButton m_btnGetLatLon;
 
 	// 活性制御
 	void UpdateControls();
 
 	// 緯度経度からエリアコードを取得する
-	CString CJpnAreaMeshDlg::GetMeshCode(
+	CString GetMeshCode(
 		const double dLat,
 		const double dLon
+	);
+
+	// エリアコードから緯度経度を取得する
+	bool GetLatLonFromMeshCode(
+		const CString strMeshCode,
+		double& dLat,
+		double& dLon
+	);
+
+	// セパレータで文字列を分割する
+	void CJpnAreaMeshDlg::SplitString(
+		const CString& strTmp,
+		const CString& strSep,
+		CStringArray& aryString
 	);
 };
