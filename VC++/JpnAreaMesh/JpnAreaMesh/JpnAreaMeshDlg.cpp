@@ -135,7 +135,7 @@ void CJpnAreaMeshDlg::OnBnClickedBtnGetMeshCode()
 	const double dLon = _ttof(strLon);
 
 	// 独自メッシュコード？
-	const bool bIsDokujiMesh = this->m_chkDokujiMeshCode.GetCheck();
+	const bool bIsDokujiMesh = (this->m_chkDokujiMeshCode.GetCheck() == BST_CHECKED) ? true : false;
 
 	// メッシュコード取得
 	const CString strMeshCode = this->GetMeshCode(dLat, dLon, bIsDokujiMesh);
