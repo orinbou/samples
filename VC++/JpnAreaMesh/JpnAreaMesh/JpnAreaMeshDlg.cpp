@@ -251,7 +251,7 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 		const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
 		const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
 
-		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
+		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/2）
 		const double dLatUnit3 = dLatUnit2 / 2.0;
 		const double dLonUnit3 = dLonUnit2 / 2.0;
 
