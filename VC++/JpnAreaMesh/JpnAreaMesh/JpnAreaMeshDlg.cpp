@@ -214,6 +214,9 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	// -----------------------------------------------------------------------
 	// ★4次メッシュ
 	// -----------------------------------------------------------------------
+	// 3次メッシュの南西端の緯度、経度を除算した余りを求める
+	const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
+	const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
 	CString strMeshCode9A;
 	if (bIsDokujiMesh)
 	{
@@ -224,10 +227,6 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 		// ・3次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
 		// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nn-nn-nnのように記述します。
 		// -----------------------------------------------------------------------
-		// 3次メッシュの南西端の緯度、経度を除算した余りを求める
-		const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
-		const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
-
 		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
 		const double dLatUnit3 = dLatUnit2 / 10.0;
 		const double dLonUnit3 = dLonUnit2 / 10.0;
@@ -247,10 +246,6 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 		// ・参考1：http://www.sinfonica.or.jp/mesh/mimginfo.html
 		// ・参考2：http://www.opengis.co.jp/htm/basic/mesh_polygon.htm
 		// -----------------------------------------------------------------------
-		// 3次メッシュの南西端の緯度、経度を除算した余りを求める
-		const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
-		const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
-
 		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/2）
 		const double dLatUnit3 = dLatUnit2 / 2.0;
 		const double dLonUnit3 = dLonUnit2 / 2.0;
