@@ -37,6 +37,7 @@ private:
 	// メンバ変数
 	CEdit m_edtLat;
 	CEdit m_edtLon;
+	CButton m_chkDokujiMeshCode;
 	CButton m_btnGetMeshCode;
 	CEdit m_edtMeshCode;
 	CButton m_btnGetLatLon;
@@ -47,7 +48,8 @@ private:
 	// 緯度経度からエリアコードを取得する
 	CString GetMeshCode(
 		const double dLat,
-		const double dLon
+		const double dLon,
+		const bool bIsDokujiMesh
 	);
 
 	// エリアコードから緯度経度を取得する
