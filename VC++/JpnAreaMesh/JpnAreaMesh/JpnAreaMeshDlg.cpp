@@ -25,6 +25,7 @@ void CJpnAreaMeshDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDT_LAT, m_edtLat);
 	DDX_Control(pDX, IDC_EDT_LON, m_edtLon);
+	DDX_Control(pDX, IDC_CHK_DOKUJI, m_chkDokujiMeshCode);
 	DDX_Control(pDX, IDC_BTN_GET_MESH_CODE, m_btnGetMeshCode);
 	DDX_Control(pDX, IDC_EDT_MESH_CODE, m_edtMeshCode);
 	DDX_Control(pDX, IDC_BTN_GET_LAT_LON, m_btnGetLatLon);
@@ -56,6 +57,7 @@ BOOL CJpnAreaMeshDlg::OnInitDialog()
 	this->m_edtLat.SetWindowText(_T("35.68823693"));
 	this->m_edtLon.SetWindowText(_T("139.70974445"));
 	this->m_edtMeshCode.SetWindowText(_T("5339-45-26"));
+	this->m_chkDokujiMeshCode.SetCheck(BST_CHECKED);
 
 	// 活性制御
 	this->UpdateControls();
@@ -132,8 +134,11 @@ void CJpnAreaMeshDlg::OnBnClickedBtnGetMeshCode()
 	this->m_edtLon.GetWindowText(strLon);
 	const double dLon = _ttof(strLon);
 
+	// 独自メッシュコード？
+	const bool bIsDokujiMesh = this->m_chkDokujiMeshCode.GetCheck();
+
 	// メッシュコード取得
-	const CString strMeshCode = this->GetMeshCode(dLat, dLon);
+	const CString strMeshCode = this->GetMeshCode(dLat, dLon, bIsDokujiMesh);
 	TRACE(strMeshCode + _T("\n"));
 
 	// メッシュコード表示
@@ -151,7 +156,8 @@ void CJpnAreaMeshDlg::OnBnClickedBtnGetMeshCode()
 */
 CString CJpnAreaMeshDlg::GetMeshCode(
 	const double dLat,
-	const double dLon
+	const double dLon,
+	const bool bIsDokujiMesh
 )
 {
 	// -----------------------------------------------------------------------
@@ -206,24 +212,60 @@ CString CJpnAreaMeshDlg::GetMeshCode(
 	strMeshCode78.Format(_T("%d%d"), iCode7, iCode8);
 
 	// -----------------------------------------------------------------------
-	// ★4次メッシュ（※勝手に考えました）
-	// ・3次メッシュを縦、横ともに10等分した四角形(3次メッシュを100分割)
-	// ・1辺の長さは約100mとなります。
-	// ・3次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
-	// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nn-nn-nnのように記述します。
+	// ★4次メッシュ
 	// -----------------------------------------------------------------------
-	// 3次メッシュの南西端の緯度、経度を除算した余りを求める
-	const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
-	const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
-
-	// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
-	const double dLatUnit3 = dLatUnit2 / 10.0;
-	const double dLonUnit3 = dLonUnit2 / 10.0;
-
-	const int iCode9 = static_cast<int>(dLatRest3 / dLatUnit3);
-	const int iCodeA = static_cast<int>(dLonRest3 / dLonUnit3);
 	CString strMeshCode9A;
-	strMeshCode9A.Format(_T("%d%d"), iCode9, iCodeA);
+	if (bIsDokujiMesh)
+	{
+		// -----------------------------------------------------------------------
+		// ☆独自4次メッシュ（※勝手に考えました）
+		// ・3次メッシュを縦、横ともに10等分した四角形(3次メッシュを100分割)
+		// ・1辺の長さは約100mとなります。
+		// ・3次メッシュの西南端を基点(0, 0)とし、上1桁が北方向へのメッシュ位置、下1桁が東方向へのメッシュ位置を表します。
+		// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nn-nn-nnのように記述します。
+		// -----------------------------------------------------------------------
+		// 3次メッシュの南西端の緯度、経度を除算した余りを求める
+		const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
+		const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
+
+		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
+		const double dLatUnit3 = dLatUnit2 / 10.0;
+		const double dLonUnit3 = dLonUnit2 / 10.0;
+
+		const int iCode9 = static_cast<int>(dLatRest3 / dLatUnit3);
+		const int iCodeA = static_cast<int>(dLonRest3 / dLonUnit3);
+
+		strMeshCode9A.Format(_T("%d%d"), iCode9, iCodeA);
+	}
+	else
+	{
+		// -----------------------------------------------------------------------
+		// ☆第4次メッシュ（1/2地域メッシュ）
+		// ・3次メッシュを縦、横ともに2等分した四角形(3次メッシュを4分割)
+		// ・1辺の長さは約500mとなります。
+		// ・1次メッシュ、2次メッシュ、3次メッシュと組み合わせてnnnn-nn-nn-nのように記述します。
+		// ・参考1：http://www.sinfonica.or.jp/mesh/mimginfo.html
+		// ・参考2：http://www.opengis.co.jp/htm/basic/mesh_polygon.htm
+		// -----------------------------------------------------------------------
+		// 3次メッシュの南西端の緯度、経度を除算した余りを求める
+		const double dLatRest3 = dLatRest2 - (static_cast<double>(iCode7) * dLatUnit2);
+		const double dLonRest3 = dLonRest2 - (static_cast<double>(iCode8) * dLonUnit2);
+
+		// 3次メッシュの緯度経度方向ごとの刻み幅（3次メッシュの刻みの1/10）
+		const double dLatUnit3 = dLatUnit2 / 2.0;
+		const double dLonUnit3 = dLonUnit2 / 2.0;
+
+		const int iCodeLat = static_cast<int>(dLatRest3 / dLatUnit3);
+		const int iCodeLon = static_cast<int>(dLonRest3 / dLonUnit3);
+
+		int iCode;
+		if      ((iCodeLat == 0) && (iCodeLon == 0)) iCode = 1;
+		else if ((iCodeLat == 0) && (iCodeLon == 1)) iCode = 2;
+		else if ((iCodeLat == 1) && (iCodeLon == 0)) iCode = 3;
+		else if ((iCodeLat == 1) && (iCodeLon == 1)) iCode = 4;
+
+		strMeshCode9A.Format(_T("%d"), iCode);
+	}
 
 	return strMeshCode1234 + _T("-") +  strMeshCode56 + _T("-") + strMeshCode78 + _T("-") + strMeshCode9A;
 }
