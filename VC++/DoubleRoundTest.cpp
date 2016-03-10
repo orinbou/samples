@@ -42,6 +42,5 @@ void DoubleRoundTest()
 		lAfter3 = (long)(dSrc + 0.5 - (dSrc < 0));	// 四捨五入（２） ※コレが一番イイ！
 		TRACE(_T("%f -> (cast, RO1, RO2) = (%d, %d, %d)\n"), dSrc, lAfter1, lAfter2, lAfter3);
 	}
-
 	return;
 }
